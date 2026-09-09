@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8-bit Computer</title>
+    <style>
+        body {
+            padding: 0;
+            margin: 10px;
+        }
+
+        td.inputbox {
+            padding: 0;
+            margin: 0;
+        }
+
+        table,
+        th,
+        tr,
+        td {
+            text-align: center;
+            border: 1px solid white;
+        }
+
+        th,
+        td {
+            padding: 5px;
+        }
+
+        input {
+            padding-top: 5px;
+            padding-bottom: 5px;
+            padding-left: 10px;
+            padding-right: 10px;
+            color: #ffffff;
+            width: 300px;
+            background-color: rgba(0, 0, 0, 0);
+        }
+
+        input:hover {
+            background-color: #353535;
+        }
+
+        input:focus {
+            background-color: #353535;
+        }
+
+        a {
+            color: white;
+            margin-right: 10px;
+        }
+
+        a:hover {
+            color: #999999;
+        }
+    </style>
+</head>
+
+<body style="background-color:#282828;font-family:Arial;color:white;">
+    <div style="display:flex">
+
+        <div style="flex:1; padding: 10px;" id="maindiv">
+            <h1>
+                8-Bit Computer
+            </h1>
+            <button type="button" style="margin: 10px; padding: 10px" , onclick="assemble()">Reprogram</button>
+            <button type="button" style="margin: 10px; padding: 10px" , onclick="execute()">Execute</button>
+            <button type="button" style="margin: 10px; padding: 10px" , onclick="halt()">Halt</button>
+            <p>Simulation Speed <input id="speed" style="width:50px; border: 2px solid white" value="2">
+                </input> fps</p>
+            <h2> Memory </h2>
+            <table id="memory">
+                <thead>
+                    <tr>
+                        <td style="font-size: 14pt; font-weight: bold;"> Address </td>
+                        <td style="font-size: 14pt; font-weight: bold; width:300px"> Input Data </td>
+                        <td style="font-size: 14pt; font-weight: bold;"> Actual Data </td>
+                    </tr>
+                </thead>
+            </table>
+
+        </div>
+        <main style="flex:1;">
+            <script src=" p5.js">
+            </script>
+            <!-- <script src="../addons/p5.sound.js"></script> -->
+            <script src="sketch.js"></script>
+        </main>
+    </div>
+
+</body>
+
+</html>
