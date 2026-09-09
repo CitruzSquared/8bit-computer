@@ -263,7 +263,7 @@ function CPU_step() {
     if (result[0] == "1") {
         NZP = [1, 0, 0];
     }
-    else if (result == "00000000") {
+    else if (result == "00000000" || result == "") {
         NZP = [0, 1, 0];
     }
     else {
