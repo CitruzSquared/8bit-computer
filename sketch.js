@@ -455,11 +455,8 @@ function assemble() {
         }
         NZP = [0, 0, 0];
         PC = 0;
+        IR = "00000000";
         EXECUTE = false;
-        var fps = Number(document.getElementById("speed").value);
-        if (fps <= 0) {
-            fps = 2;
-        }
         document.getElementById(`databox${i}`).innerHTML = `0x${binary_to_hex(MEMORY[i])}`;
         redraw();
     }
@@ -500,6 +497,7 @@ function execute() {
     }
     NZP = [0, 0, 0];
     PC = 0;
+    IR = "00000000";
     EXECUTE = true;
     var fps = Number(document.getElementById("speed").value);
     if (fps <= 0) {
