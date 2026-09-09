@@ -527,8 +527,8 @@ function execute() {
     var fps = Number(document.getElementById("speed").value);
     if (fps <= 0) {
         fps = 2;
+        document.getElementById("speed").value = 2;
     }
-    document.getElementById("speed").value = 2;
     var outputbox = document.getElementById("outputbox");
     outputbox.innerHTML = "";
     frameRate(fps);
