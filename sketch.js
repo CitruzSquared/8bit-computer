@@ -455,6 +455,7 @@ function assemble() {
         }
         NZP = [0, 0, 0];
         PC = 0;
+        EXECUTE = false;
         var fps = Number(document.getElementById("speed").value);
         if (fps <= 0) {
             fps = 2;
