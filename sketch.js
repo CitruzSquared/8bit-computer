@@ -7,7 +7,8 @@ var NZP = [0, 0, 0];
 var start_frame;
 
 var hexadecimal = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
-var OPCODES = ["NOT", "AND", "ANDI", "OR", "ORI", "ADD", "ADDI", "SUB", "CMP", "LD", "LDR", "ST", "STR", "BR", "HALT", "OUT"];
+//              1      2      3       4      5       6      7      8      9     10     11    12     13    14     15
+var OPCODES = ["NOT", "AND", "ANDI", "ADD", "ADDI", "JMP", "RET", "CMP", "LD", "LDR", "ST", "STR", "BR", "OUT", "HALT"];
 
 function setup() {
     var parent = document.getElementById("canvas-container");
@@ -33,7 +34,6 @@ function setup() {
 }
 
 function draw() {
-    console.log(frameCount, start_frame);
     if (EXECUTE) {
         if (frameCount > start_frame + 1) {
             CPU_step();
@@ -106,7 +106,7 @@ function draw() {
 function CPU_step() {
     IR = MEMORY[PC];
     PC += 1;
-    var one_register = [1, 3, 5, 7, 10, 12];
+    var one_register = [1, 3, 5, 9, 11, 14];
     var reg1 = 0;
     var reg2 = 0;
     var condition = [];
@@ -114,7 +114,16 @@ function CPU_step() {
     if (one_register.indexOf(opcode) >= 0) {
         reg1 = binary_to_unsigned(IR.substring(6));
     }
-    else if (opcode == 14) {
+    else if (opcode == 6) { // JMP
+        REGISTERS[3] = unsigned_to_binary(PC + 1);
+        PC = binary_to_unsigned(MEMORY[PC]);
+        return;
+    }
+    else if (opcode == 7) { // RET
+        PC = binary_to_unsigned(REGISTERS[3]);
+        return;
+    }
+    else if (opcode == 13) { // BR
         condition[0] = Number(IR.substring(5, 6));
         condition[1] = Number(IR.substring(6, 7));
         condition[2] = Number(IR.substring(7));
@@ -124,18 +133,11 @@ function CPU_step() {
         else {
             PC += 1;
         }
+        return;
     }
-    else if (opcode == 15) { //OUT
-        if (IR.substring(4, 6) == "00") {
-            var outputbox = document.getElementById("outputbox");
-            reg1 = binary_to_unsigned(IR.substring(6));
-            outputbox.innerHTML += String.fromCharCode(binary_to_unsigned(REGISTERS[reg1].substring(1)));
-            return;
-        }
-        else {  //HALT
-            EXECUTE = false;
-            return;
-        }
+    else if (opcode == 15) {    // HALT
+        EXECUTE = false;
+        return;
     }
     else {
         reg1 = binary_to_unsigned(IR.substring(4, 6));
@@ -184,81 +186,54 @@ function CPU_step() {
             REGISTERS[reg1] = result;
             PC += 1;
             break;
-        case 4: //OR
-            var data1 = REGISTERS[reg1];
-            var data2 = REGISTERS[reg2];
-            for (i = 0; i < 8; i++) {
-                if (data1[i] == 1 || data2[i] == 1) {
-                    result += "1";
-                }
-                else {
-                    result += "0";
-                }
-            }
-            REGISTERS[reg1] = result;
-            break;
-        case 5: //ORI
-            var data1 = REGISTERS[reg1];
-            var data2 = MEMORY[PC];
-            for (i = 0; i < 8; i++) {
-                if (data1[i] == 1 || data2[i] == 1) {
-                    result += "1";
-                }
-                else {
-                    result += "0";
-                }
-            }
-            REGISTERS[reg1] = result;
-            PC += 1;
-            break;
-        case 6: //ADD
+        case 4: //ADD
             var data1 = binary_to_int(REGISTERS[reg1]);
             var data2 = binary_to_int(REGISTERS[reg2]);
             result = int_to_binary(data1 + data2);
             REGISTERS[reg1] = result;
             break;
-        case 7: //ADDI
+        case 5: //ADDI
             var data1 = binary_to_int(REGISTERS[reg1]);
             var data2 = binary_to_int(MEMORY[PC]);
             result = int_to_binary(data1 + data2);
             REGISTERS[reg1] = result;
             PC += 1;
             break;
-        case 8: //SUB
-            var data1 = binary_to_int(REGISTERS[reg1]);
-            var data2 = binary_to_int(REGISTERS[reg2]);
-            result = int_to_binary(data1 - data2);
-            REGISTERS[reg1] = result;
-            break;
-        case 9: //CMP
+        case 8: //CMP
             var data1 = binary_to_int(REGISTERS[reg1]);
             var data2 = binary_to_int(REGISTERS[reg2]);
             result = int_to_binary(data1 - data2);
             break;
-        case 10: //LD
+        case 9: //LD
             var data2 = binary_to_unsigned(MEMORY[PC]);
             result = MEMORY[data2];
             REGISTERS[reg1] = result;
             PC += 1;
             break;
-        case 11: //LDR
+        case 10: //LDR
             var data2 = binary_to_unsigned(REGISTERS[reg2]);
             result = MEMORY[data2];
             REGISTERS[reg1] = result;
             break;
-        case 12: //ST
+        case 11: //ST
             var data1 = REGISTERS[reg1];
             var data2 = binary_to_unsigned(MEMORY[PC]);
             MEMORY[data2] = data1;
             result = data1;
             PC += 1;
             break;
-        case 13: //STR
+        case 12: //STR
             var data1 = REGISTERS[reg1];
             var data2 = binary_to_unsigned(REGISTERS[reg2]);
             MEMORY[data2] = data1;
             result = data1;
             break;
+        case 14: // OUT
+            var data1 = REGISTERS[reg1];
+            var outputbox = document.getElementById("outputbox");
+            result = data1.substring(1);
+            outputbox.innerHTML += String.fromCharCode(binary_to_unsigned(result));
+            return;
     }
     if (result[0] == "1") {
         NZP = [1, 0, 0];
@@ -410,31 +385,34 @@ function assemble() {
                     code = code.substring(5);
                 }
                 var index = OPCODES.indexOf(opcode) + 1;
+                opcode_bin = unsigned_to_binary(index).substring(4);
                 var valid = false;
-                if (index > 0) {
-                    opcode_bin = unsigned_to_binary(index).substring(4);
-                }
-                if (index == 16) {
-                    opcode_bin = "1111";
-                }
                 if (opcode_bin != "0000") {
                     code = code.replaceAll(' ', '')
                     var words = code.split(",");
                     var args = "";
-                    if (index == 15) {
+                    if (index == 6) {
+                        valid = true;
+                        args = "0000";
+                    }
+                    else if (index == 7) {
+                        valid = true;
+                        args = "0000";
+                    }
+                    else if (index == 15) {
                         valid = true;
                         args = "1111";
                     }
-                    if (index == 16) {
+                    else if (index == 16) {
                         if (words.length == 1 && isRegister(words[0])) {
                             valid = true;
                             args = `00${unsigned_to_binary(words[0][1]).substring(6)}`;
                         }
                     }
-                    var one_argument = [1, 3, 5, 7, 10, 12, 14];
+                    var one_argument = [1, 3, 5, 9, 11, 13, 14];
                     if (one_argument.indexOf(index) >= 0) {
                         args += "0";
-                        if (index == 14) {
+                        if (index == 13) {
                             if (words[0].indexOf("N") >= 0) {
                                 valid = true;
                                 args += "1";
