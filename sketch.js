@@ -4,13 +4,16 @@ var EXECUTE = false;
 var PC = 0;
 var IR = "00000000";
 var NZP = [0, 0, 0];
+var start_frame;
 
 var hexadecimal = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
-var OPCODES = ["NOT", "AND", "ANDI", "OR", "ORI", "ADD", "ADDI", "SUB", "CMP", "LD", "LDR", "ST", "STR", "BR", "HALT"];
+var OPCODES = ["NOT", "AND", "ANDI", "OR", "ORI", "ADD", "ADDI", "SUB", "CMP", "LD", "LDR", "ST", "STR", "BR", "HALT", "OUT"];
 
 function setup() {
+    var parent = document.getElementById("canvas-container");
     let w = Math.max(windowWidth / 1.5, 600);
-    createCanvas(w / 1.2, w / 1.5);
+    var cnv = createCanvas(w / 1.2, w / 1.75);
+    cnv.parent(parent);
     textFont('Courier New');
     textAlign(LEFT, TOP);
     var memory_table = document.getElementById("memory");
@@ -30,6 +33,12 @@ function setup() {
 }
 
 function draw() {
+    console.log(frameCount, start_frame);
+    if (EXECUTE) {
+        if (frameCount > start_frame + 1) {
+            CPU_step();
+        }
+    }
     background(0);
     noStroke();
     fill(255);
@@ -85,11 +94,8 @@ function draw() {
             else {
                 fill(255);
             }
-            text(str, (width - 10) / 16 * j + 12, (height - 160) / 16 * i + 165);
+            text(str, (width - 10) / 16 * j + 12, (height - 160) / 16 * i + 155);
         }
-    }
-    if (EXECUTE) {
-        CPU_step();
     }
     if (PC >= 256) {
         EXECUTE = false;
@@ -119,9 +125,17 @@ function CPU_step() {
             PC += 1;
         }
     }
-    else if (opcode == 15) {
-        EXECUTE = false;
-        return;
+    else if (opcode == 15) { //OUT
+        if (IR.substring(4, 6) == "00") {
+            var outputbox = document.getElementById("outputbox");
+            reg1 = binary_to_unsigned(IR.substring(6));
+            outputbox.innerHTML += String.fromCharCode(binary_to_unsigned(REGISTERS[reg1].substring(1)));
+            return;
+        }
+        else {  //HALT
+            EXECUTE = false;
+            return;
+        }
     }
     else {
         reg1 = binary_to_unsigned(IR.substring(4, 6));
@@ -397,6 +411,9 @@ function assemble() {
                 if (index > 0) {
                     opcode_bin = unsigned_to_binary(index).substring(4);
                 }
+                if (index == 16) {
+                    opcode_bin = "1111";
+                }
                 if (opcode_bin != "0000") {
                     code = code.replaceAll(' ', '')
                     var words = code.split(",");
@@ -404,6 +421,12 @@ function assemble() {
                     if (index == 15) {
                         valid = true;
                         args = "1111";
+                    }
+                    if (index == 16) {
+                        if (words.length == 1 && isRegister(words[0])) {
+                            valid = true;
+                            args = `00${unsigned_to_binary(words[0][1]).substring(6)}`;
+                        }
                     }
                     var one_argument = [1, 3, 5, 7, 10, 12, 14];
                     if (one_argument.indexOf(index) >= 0) {
@@ -450,16 +473,18 @@ function assemble() {
             }
         }
         MEMORY[i] = result;
-        for (let i = 0; i < REGISTERS.length; i++) {
-            REGISTERS[i] = "00000000";
-        }
-        NZP = [0, 0, 0];
-        PC = 0;
-        IR = "00000000";
-        EXECUTE = false;
         document.getElementById(`databox${i}`).innerHTML = `0x${binary_to_hex(MEMORY[i])}`;
-        redraw();
     }
+    for (let i = 0; i < REGISTERS.length; i++) {
+        REGISTERS[i] = "00000000";
+    }
+    NZP = [0, 0, 0];
+    PC = 0;
+    IR = "00000000";
+    EXECUTE = false;
+    var outputbox = document.getElementById("outputbox");
+    outputbox.innerHTML = "";
+    redraw();
 }
 
 function isNumeric(str) {
@@ -495,15 +520,18 @@ function execute() {
     for (let i = 0; i < REGISTERS.length; i++) {
         REGISTERS[i] = "00000000";
     }
+    IR = "00000000";
     NZP = [0, 0, 0];
     PC = 0;
-    IR = "00000000";
     EXECUTE = true;
     var fps = Number(document.getElementById("speed").value);
     if (fps <= 0) {
         fps = 2;
     }
+    var outputbox = document.getElementById("outputbox");
+    outputbox.innerHTML = "";
     frameRate(fps);
+    start_frame = frameCount;
     redraw();
     loop();
 }
