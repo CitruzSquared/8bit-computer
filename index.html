@@ -37,6 +37,8 @@
             color: #ffffff;
             width: 300px;
             background-color: rgba(0, 0, 0, 0);
+            font-family: 'Courier New', Courier, monospace;
+
         }
 
         input:hover {
@@ -55,16 +57,28 @@
         a:hover {
             color: #999999;
         }
+
+        button {
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #aaccff;
+        }
     </style>
 </head>
 
-<body style="background-color:#282828;font-family:Arial;color:white;">
+<body style="background-color:#282828;font-family:Arial;color:white; font-family: 'Courier New', Courier, monospace;">
     <div style="display:flex">
 
         <div style="flex:1; padding: 10px;" id="maindiv">
             <h1>
                 8-Bit Computer
             </h1>
+            <p><a href="./instructions.html" target="_blank">See programming help here</a></p>
             <button type="button" style="margin: 10px; padding: 10px" , onclick="assemble()">Reprogram</button>
             <button type="button" style="margin: 10px; padding: 10px" , onclick="execute()">Execute</button>
             <button type="button" style="margin: 10px; padding: 10px" , onclick="halt()">Halt</button>
@@ -90,7 +104,7 @@
                 <script src="sketch.js"></script>
             </div>
             <h2> Text Output</h2>
-            <div style="padding: 10px; flex:1; background-color: black; font-family: 'Courier New', Courier, monospace; font-size: 24px; white-space: pre-wrap;"
+            <div style="padding: 10px; flex:1; background-color: black;  font-size: 24px; white-space: pre-wrap;"
                 id="outputbox">
 
             </div>
