@@ -72,8 +72,8 @@
             <b>IR</b> which holds the current instruction and <b>PC</b> which holds the address of the next instruction.
         </p>
         <p>
-            All instructions increment the PC by 1 before execution. Some instructions (marked with *) increment the PC
-            again after execution.
+            All instructions increment the PC by 1 before execution. Some instructions increment the PC
+            again after execution (most two-byte instructions).
         </p>
 
         <h2> Numbers </h2>
@@ -268,7 +268,7 @@
             <b> 0d-1 </b> (parsed as 0xFF)
         </p>
 
-        <h3> 6+. JMP (OPCODE: 0110) </h3>
+        <h3> 6*+. JMP (OPCODE: 0110) </h3>
         <p> Jump to subroutine. </p>
         <table style="width:450px">
             <tr>
