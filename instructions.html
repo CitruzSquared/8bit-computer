@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8-bit Computer</title>
+    <style>
+        body {
+            padding: 20px;
+            margin: 10px;
+        }
+
+        td.inputbox {
+            padding: 0;
+            margin: 0;
+        }
+
+        table,
+        th,
+        tr,
+        td {
+            text-align: center;
+            border: 1px solid white;
+        }
+
+        th,
+        td {
+            padding: 5px;
+        }
+
+        a {
+            color: white;
+            margin-right: 10px;
+        }
+
+        a:hover {
+            color: #999999;
+        }
+
+        thead {
+            font-weight: bold;
+        }
+
+        b {
+            color: #ffffbb;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #aaccff;
+        }
+    </style>
+</head>
+
+<body style="background-color:#282828;font-family:Arial;color:white; font-family: 'Courier New', Courier, monospace;">
+
+    <div style="width:60%;">
+        <h1>8-bit Computer ISA</h1>
+        <p><a href="./index.html" target="_blank"> Go back to computer here</a></p>
+        <h2> Buttons </h2>
+        <p>
+            <b>Reprogram</b> reinitializes all registers and sets the memory to the values in "Input Data". <br>
+            <b>Execute</b> reinitializes all registers and starts execution. <br>
+            <b>Halt</b> simply stops execution. <br>
+        </p>
+        <h2> Registers </h2>
+        <p> There are four general purpose registers, called <b>R0</b>, <b>R1</b>, <b>R2</b>, and <b>R3</b>. These are
+            simply written as 00, 01, 10, 11 in machine code instructions. There are
+            also two special registers:
+            <b>IR</b> which holds the current instruction and <b>PC</b> which holds the address of the next instruction.
+        </p>
+        <p>
+            All instructions increment the PC by 1 before execution. Some instructions (marked with *) increment the PC
+            again after execution.
+        </p>
+
+        <h2> Numbers </h2>
+        <p> All code is to be written in the "Input Data" column of the memory table. In order for the assembler to
+            recognize that the input is a number, it must be prefixed with <b>0d</b> (for decimal numbers), <b>0x</b>
+            (for hexadecimal numbers) and <b>0b</b> (for binary numbers).</p>
+        <p> Any number not containing characters that are not 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A, B, C, D, E, F, or - won't
+            be parsed. Any character that is not a 0 or 1 in a number prefixed with 0b will be counted as a 0.</p>
+        <p> For binary and hexadecimal input numbers, the last 8 (for binary) and last 2 (for hexadecimal) digits of the
+            number will be
+            parsed. For decimal input numbers, any number greater than 127 will be capped to 127, and any number less
+            than -128 will be capped to -128.
+        </p>
+        <table>
+            <caption> Examples </caption>
+            <thead>
+                <tr>
+                    <td> Input Number </td>
+                    <td> Parsed Input</td>
+                </tr>
+            </thead>
+            <tr>
+                <td> 0b111111111101</td>
+                <td> 0xFD</td>
+            </tr>
+            <tr>
+                <td> 0d-555</td>
+                <td> 0x80</td>
+            </tr>
+            <tr>
+                <td> 0xABC</td>
+                <td> 0xBC</td>
+            </tr>
+            <tr>
+                <td> 0d-1</td>
+                <td> 0xFF</td>
+            </tr>
+        </table>
+        <h2> NZP </h2>
+        <p>
+            <b>N</b>, <b>Z</b>, and <b>P</b> are three flags set by the computer.
+            <br> If the last result was negative, then [N, Z, P] = [1, 0, 0].
+            <br> If the last result was zero, then [N, Z, P] = [0, 1, 0].
+            <br> If the last result was positive, then [N, Z, P] = [0, 0, 1].
+        </p>
+        <h2> Instructions </h2>
+        Instructions are based off of the LC-3 (Little Computer 3) ISA. <br>
+        Some instructions are 1 byte only, while some (marked with *) are 2 bytes long. <br>
+        Instructions marked with a + do not change the NZP flags.
+        <h3> 1. NOT (OPCODE: 0001) </h3>
+        <table style="width:450px">
+            <tr>
+                <td style="font-weight: bold">BITS</td>
+                <td>7</td>
+                <td>6</td>
+                <td>5</td>
+                <td>4</td>
+                <td>3</td>
+                <td>2</td>
+                <td>1</td>
+                <td>0</td>
+            </tr>
+            <tr style="height:50px; font-weight: bold;">
+                <td>BYTE 1</td>
+                <td colspan="4">0001</td>
+                <td colspan="2">00</td>
+                <td colspan="2">DR</td>
+            </tr>
+        </table>
+        <p>
+            FUNCTION: DR = NOT DR;
+            <br> <br> Example: <br>
+            <b> NOT R3 </b> (parsed as 0x13)
+        </p>
+
+        <h3> 2. AND (OPCODE: 0010) </h3>
+        <table style="width:450px">
+            <tr>
+                <td style="font-weight: bold">BITS</td>
+                <td>7</td>
+                <td>6</td>
+                <td>5</td>
+                <td>4</td>
+                <td>3</td>
+                <td>2</td>
+                <td>1</td>
+                <td>0</td>
+            </tr>
+            <tr style="height:50px; font-weight: bold;">
+                <td>BYTE 1</td>
+                <td colspan="4">0010</td>
+                <td colspan="2">DR</td>
+                <td colspan="2">SR</td>
+            </tr>
+        </table>
+        <p>
+            FUNCTION: DR = DR AND SR;
+            <br> <br> Example: <br>
+            <b> AND R0, R2 </b> (parsed as 0x28)
+        </p>
+
+        <h3> 3*. ANDI (OPCODE: 0011) </h3>
+        <p> AND with immediate. </p>
+        <table style="width:450px">
+            <tr>
+                <td style="font-weight: bold">BITS</td>
+                <td>7</td>
+                <td>6</td>
+                <td>5</td>
+                <td>4</td>
+                <td>3</td>
+                <td>2</td>
+                <td>1</td>
+                <td>0</td>
+            </tr>
+            <tr style="height:50px; font-weight: bold;">
+                <td>BYTE 1</td>
+                <td colspan="4">0010</td>
+                <td colspan="2">00</td>
+                <td colspan="2">DR</td>
+            </tr>
+            <tr style="height:50px; font-weight: bold;">
+                <td>BYTE 2</td>
+                <td colspan="8">IMM8 </td>
+            </tr>
+        </table>
+        <p>
+            FUNCTION: DR = DR AND IMM8; PC = PC + 1;
+            <br> <br> Example: <br>
+            <b> ANDI R1 </b> (parsed as 0x31) <br>
+            <b> 0xF4 </b> (parsed as 0xF4)
+        </p>
+
+        <h3> 4. ADD (OPCODE: 0100) </h3>
+        <table style="width:450px">
+            <tr>
+                <td style="font-weight: bold">BITS</td>
+                <td>7</td>
+                <td>6</td>
+                <td>5</td>
+                <td>4</td>
+                <td>3</td>
+                <td>2</td>
+                <td>1</td>
+                <td>0</td>
+            </tr>
+            <tr style="height:50px; font-weight: bold;">
+                <td>BYTE 1</td>
+                <td colspan="4">0100</td>
+                <td colspan="2">DR</td>
+                <td colspan="2">SR</td>
+            </tr>
+        </table>
+        <p>
+            FUNCTION: DR = DR + SR;
+            <br> <br> Example: <br>
+            <b> ADD R1, R0 </b> (parsed as 0x44)
+        </p>
+
+        <h3> 5*. ADDI (OPCODE: 0101) </h3>
+        <p> Add with immediate. </p>
+        <table style="width:450px">
+            <tr>
+                <td style="font-weight: bold">BITS</td>
+                <td>7</td>
+                <td>6</td>
+                <td>5</td>
+                <td>4</td>
+                <td>3</td>
+                <td>2</td>
+                <td>1</td>
+                <td>0</td>
+            </tr>
+            <tr style="height:50px; font-weight: bold;">
+                <td>BYTE 1</td>
+                <td colspan="4">0101</td>
+                <td colspan="2">00</td>
+                <td colspan="2">DR</td>
+            </tr>
+            <tr style="height:50px; font-weight: bold;">
+                <td>BYTE 2</td>
+                <td colspan="8">IMM8 </td>
+            </tr>
+        </table>
+        <p>
+            FUNCTION: DR = DR + IMM8; PC = PC + 1;
+            <br> <br> Example: <br>
+            <b> ADDI R3 </b> (parsed as 0x53) <br>
+            <b> 0d-1 </b> (parsed as 0xFF)
+        </p>
+
+        <h3> 6+. JMP (OPCODE: 0110) </h3>
+        <p> Jump to subroutine. </p>
+        <table style="width:450px">
+            <tr>
+                <td style="font-weight: bold">BITS</td>
+                <td>7</td>
+                <td>6</td>
+                <td>5</td>
+                <td>4</td>
+                <td>3</td>
+                <td>2</td>
+                <td>1</td>
+                <td>0</td>
+            </tr>
+            <tr style="height:50px; font-weight: bold;">
+                <td>BYTE 1</td>
+                <td colspan="4">0110</td>
+                <td colspan="4">0000</td>
+            </tr>
+            <tr style="height:50px; font-weight: bold;">
+                <td>BYTE 2</td>
+                <td colspan="8">IMM8 </td>
+            </tr>
+        </table>
+        <p>
+            FUNCTION: R3 = PC + 1; PC = IMM8;
+            <br> <br> Example: <br>
+            <b> JMP </b> (parsed as 0x60) <br>
+            <b> 0x30 </b> (parsed as 0x30)
+        </p>
+
+        <h3> 7+. RET (OPCODE: 0111) </h3>
+        <p> Return from subroutine. </p>
+        <table style="width:450px">
+            <tr>
+                <td style="font-weight: bold">BITS</td>
+                <td>7</td>
+                <td>6</td>
+                <td>5</td>
+                <td>4</td>
+                <td>3</td>
+                <td>2</td>
+                <td>1</td>
+                <td>0</td>
+            </tr>
+            <tr style="height:50px; font-weight: bold;">
+                <td>BYTE 1</td>
+                <td colspan="4">0111</td>
+                <td colspan="4">0000</td>
+            </tr>
+        </table>
+        <p>
+            FUNCTION: PC = R3;
+            <br> <br> Example: <br>
+            <b> RET </b> (parsed as 0x70)
+        </p>
+
+        <h3> 8. CMP (OPCODE: 1000) </h3>
+        <p> Compare two registers. </p>
+        <table style="width:450px">
+            <tr>
+                <td style="font-weight: bold">BITS</td>
+                <td>7</td>
+                <td>6</td>
+                <td>5</td>
+                <td>4</td>
+                <td>3</td>
+                <td>2</td>
+                <td>1</td>
+                <td>0</td>
+            </tr>
+            <tr style="height:50px; font-weight: bold;">
+                <td>BYTE 1</td>
+                <td colspan="4">1000</td>
+                <td colspan="2">SR1</td>
+                <td colspan="2">SR2</td>
+            </tr>
+        </table>
+        <p>
+            FUNCTION: SR1 - SR2; Discard result;
+            <br> <br> Example: <br>
+            <b> CMP R2, R1 </b> (parsed as 0x89) <br> <br>
+            This function is useful because it still sets NZP.
+        </p>
+
+        <h3> 9*. LD (OPCODE: 1001) </h3>
+        <p> Load from address. </p>
+        <table style="width:450px">
+            <tr>
+                <td style="font-weight: bold">BITS</td>
+                <td>7</td>
+                <td>6</td>
+                <td>5</td>
+                <td>4</td>
+                <td>3</td>
+                <td>2</td>
+                <td>1</td>
+                <td>0</td>
+            </tr>
+            <tr style="height:50px; font-weight: bold;">
+                <td>BYTE 1</td>
+                <td colspan="4">1001</td>
+                <td colspan="2">00</td>
+                <td colspan="2">DR</td>
+            </tr>
+            <tr style="height:50px; font-weight: bold;">
+                <td>BYTE 2</td>
+                <td colspan="8">IMM8 </td>
+            </tr>
+        </table>
+        <p>
+            FUNCTION: DR = MEM[IMM8]; PC = PC + 1;
+            <br> <br> Example: <br>
+            <b> LD R3 </b> (parsed as 0x93) <br>
+            <b> 0x20 </b> (parsed as 0x20) <br> <br>
+            The loaded value determines NZP.
+        </p>
+
+        <h3> 10. LDR (OPCODE: 1010) </h3>
+        <p> Load from pointed address. </p>
+        <table style="width:450px">
+            <tr>
+                <td style="font-weight: bold">BITS</td>
+                <td>7</td>
+                <td>6</td>
+                <td>5</td>
+                <td>4</td>
+                <td>3</td>
+                <td>2</td>
+                <td>1</td>
+                <td>0</td>
+            </tr>
+            <tr style="height:50px; font-weight: bold;">
+                <td>BYTE 1</td>
+                <td colspan="4">1010</td>
+                <td colspan="2">DR</td>
+                <td colspan="2">PR</td>
+            </tr>
+        </table>
+        <p>
+            FUNCTION: DR = MEM[PR];
+            <br> <br> Example: <br>
+            <b> LDR R1, R2 </b> (parsed as 0xA6) <br> <br>
+            The loaded value determines NZP.
+        </p>
+
+        <h3> 11*. ST (OPCODE: 1011) </h3>
+        <p> Store to address. </p>
+        <table style="width:450px">
+            <tr>
+                <td style="font-weight: bold">BITS</td>
+                <td>7</td>
+                <td>6</td>
+                <td>5</td>
+                <td>4</td>
+                <td>3</td>
+                <td>2</td>
+                <td>1</td>
+                <td>0</td>
+            </tr>
+            <tr style="height:50px; font-weight: bold;">
+                <td>BYTE 1</td>
+                <td colspan="4">1011</td>
+                <td colspan="2">00</td>
+                <td colspan="2">SR</td>
+            </tr>
+            <tr style="height:50px; font-weight: bold;">
+                <td>BYTE 2</td>
+                <td colspan="8">IMM8 </td>
+            </tr>
+        </table>
+        <p>
+            FUNCTION: MEM[IMM8] = SR; PC = PC + 1;
+            <br> <br> Example: <br>
+            <b> ST R1 </b> (parsed as 0xB1) <br>
+            <b> 0x20 </b> (parsed as 0x20) <br> <br>
+            The stored value determines NZP.
+        </p>
+
+        <h3> 12. STR (OPCODE: 1100) </h3>
+        <p> Store to pointed address. </p>
+        <table style="width:450px">
+            <tr>
+                <td style="font-weight: bold">BITS</td>
+                <td>7</td>
+                <td>6</td>
+                <td>5</td>
+                <td>4</td>
+                <td>3</td>
+                <td>2</td>
+                <td>1</td>
+                <td>0</td>
+            </tr>
+            <tr style="height:50px; font-weight: bold;">
+                <td>BYTE 1</td>
+                <td colspan="4">1100</td>
+                <td colspan="2">SR</td>
+                <td colspan="2">PR</td>
+            </tr>
+        </table>
+        <p>
+            FUNCTION: MEM[PR] = SR;
+            <br> <br> Example: <br>
+            <b> STR R1, R2 </b> (parsed as 0xC6) <br> <br>
+            The loaded value determines NZP.
+        </p>
+
+        <h3> 13*+. BR (OPCODE: 1101) </h3>
+        <p> Conditional branch based on NZP flags. </p>
+        <table style="width:450px">
+            <tr>
+                <td style="font-weight: bold">BITS</td>
+                <td>7</td>
+                <td>6</td>
+                <td>5</td>
+                <td>4</td>
+                <td>3</td>
+                <td>2</td>
+                <td>1</td>
+                <td>0</td>
+            </tr>
+            <tr style="height:50px; font-weight: bold;">
+                <td>BYTE 1</td>
+                <td colspan="4">1101</td>
+                <td>0</td>
+                <td>n</td>
+                <td>z</td>
+                <td>p</td>
+            </tr>
+            <tr style="height:50px; font-weight: bold;">
+                <td>BYTE 2</td>
+                <td colspan="8">IMM8 </td>
+            </tr>
+        </table>
+        <p>
+            FUNCTION: if ((n && N) || (z && Z) || (p && P)) {PC = IMM8;} else {PC = PC + 1;}
+            <br> <br> Example 1: <br>
+            <b> BR n </b> (parsed as 0xD4) <br>
+            <b> 0x20 </b> (parsed as 0x20)
+            <br> <br> Example 2: <br>
+            <b> BR zp </b> (parsed as 0xD3) <br>
+            <b> 0x20 </b> (parsed as 0x20)
+            <br> <br> Example 3: <br>
+            <b> BR np </b> (parsed as 0xD5) <br>
+            <b> 0x20 </b> (parsed as 0x20)
+            <br> <br> Example 4: <br>
+            <b> BR nzp </b> (parsed as 0xD7) <br>
+            <b> 0x20 </b> (parsed as 0x20)
+        </p>
+
+        <h3> 14+. OUT (OPCODE: 1110) </h3>
+        <p> Print contents of register. </p>
+        <table style="width:450px">
+            <tr>
+                <td style="font-weight: bold">BITS</td>
+                <td>7</td>
+                <td>6</td>
+                <td>5</td>
+                <td>4</td>
+                <td>3</td>
+                <td>2</td>
+                <td>1</td>
+                <td>0</td>
+            </tr>
+            <tr style="height:50px; font-weight: bold;">
+                <td>BYTE 1</td>
+                <td colspan="4">1110</td>
+                <td colspan="2">00</td>
+                <td colspan="2">SR</td>
+            </tr>
+        </table>
+        <p>
+            FUNCTION: print(ASCII value of SR[6:0]);
+            <br> <br> Example: <br>
+            <b> OUT R0 </b> (parsed as 0xE0)
+        </p>
+
+        <h3> 15+. HALT (OPCODE: 1111) </h3>
+        <table style="width:450px">
+            <tr>
+                <td style="font-weight: bold">BITS</td>
+                <td>7</td>
+                <td>6</td>
+                <td>5</td>
+                <td>4</td>
+                <td>3</td>
+                <td>2</td>
+                <td>1</td>
+                <td>0</td>
+            </tr>
+            <tr style="height:50px; font-weight: bold;">
+                <td>BYTE 1</td>
+                <td colspan="4">1111</td>
+                <td colspan="4">1111</td>
+            </tr>
+        </table>
+        <p>
+            FUNCTION: HALT;
+            <br> <br> Example: <br>
+            <b> HALT </b> (parsed as 0xFF)
+        </p>
+    </div>
+</body>
+
+</html>
