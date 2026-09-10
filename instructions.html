@@ -122,7 +122,8 @@
         <h2> Instructions </h2>
         Instructions are based off of the LC-3 (Little Computer 3) ISA. <br>
         Some instructions are 1 byte only, while some (marked with *) are 2 bytes long. <br>
-        Instructions marked with a + do not change the NZP flags.
+        Instructions marked with a + do not change the NZP flags. <br> <br>
+        All instructions are case insensitive. There is an example program at the bottom of the page.
         <h3> 1. NOT (OPCODE: 0001) </h3>
         <table style="width:450px">
             <tr>
@@ -566,6 +567,85 @@
             <br> <br> Example: <br>
             <b> HALT </b> (parsed as 0xFF)
         </p>
+
+        <h2> Example Program </h2>
+        <p> This program prints a NULL-terminated string starting at memory address 0x20.</p>
+        <table>
+            <thead>
+                <tr>
+                    <td> Address </td>
+                    <td> Code </td>
+                    <td> Actual Data </td>
+                    <td> Comments </td>
+                </tr>
+            </thead>
+            <tr>
+                <td> 0x00 </td>
+                <td style="text-align: left;"> <b>ADDI R1</b> </td>
+                <td> 0x51</td>
+                <td style="text-align: left;"> Initialize R1 to 0x20</td>
+            </tr>
+            <tr>
+                <td> 0x01 </td>
+                <td style="text-align: left;"> <b>0x20</b> </td>
+                <td> 0x20</td>
+                <td style="text-align: left;"> </td>
+            </tr>
+            <tr>
+                <td> 0x02 </td>
+                <td style="text-align: left;"> <b>LDR R0, R1</b></td>
+                <td> 0xA1</td>
+                <td style="text-align: left;"> Load character at MEM[R1] to R0</td>
+            </tr>
+            <tr>
+                <td> 0x03 </td>
+                <td style="text-align: left;"> <b>BR z</b></td>
+                <td> 0xD2</td>
+                <td style="text-align: left;"> If character is NULL, go to 0x0A </td>
+            </tr>
+            <tr>
+                <td> 0x04 </td>
+                <td style="text-align: left;"> <b>0xA</b></td>
+                <td> 0x0A</td>
+                <td style="text-align: left;"> </td>
+            </tr>
+            <tr>
+                <td> 0x05 </td>
+                <td style="text-align: left;"> <b>OUT R0</b> </td>
+                <td> 0xE0</td>
+                <td style="text-align: left;"> Else, print R0</td>
+            </tr>
+            <tr>
+                <td> 0x06 </td>
+                <td style="text-align: left;"> <b>ADDI R1</b> </td>
+                <td> 0x51</td>
+                <td style="text-align: left;"> Increment R1 </td>
+            </tr>
+            <tr>
+                <td> 0x07 </td>
+                <td style="text-align: left;"> <b>0d1</b> </td>
+                <td> 0x01</td>
+                <td style="text-align: left;"> </td>
+            </tr>
+            <tr>
+                <td> 0x08 </td>
+                <td style="text-align: left;"> <b>BR nzp</b> </td>
+                <td> 0xD7</td>
+                <td style="text-align: left;"> Unconditionally branch to 0x02</td>
+            </tr>
+            <tr>
+                <td> 0x09 </td>
+                <td style="text-align: left;"> <b>0x2</b> </td>
+                <td> 0x02</td>
+                <td style="text-align: left;"> </td>
+            </tr>
+            <tr>
+                <td> 0x0A </td>
+                <td style="text-align: left;"> <b> HALT </b> </td>
+                <td> 0xFF</td>
+                <td style="text-align: left;"> Halt </td>
+            </tr>
+        </table>
     </div>
 </body>
 
