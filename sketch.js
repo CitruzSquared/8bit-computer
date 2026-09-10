@@ -98,7 +98,10 @@ function draw() {
         }
     }
     if (PC >= 256) {
-        EXECUTE = false;
+        PC -= 256;
+    }
+    if (PC < 0) {
+        PC += 256;
     }
 }
 
