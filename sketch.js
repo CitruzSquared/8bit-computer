@@ -231,8 +231,7 @@ function CPU_step() {
         case 14: // OUT
             var data1 = REGISTERS[reg1];
             var outputbox = document.getElementById("outputbox");
-            result = data1.substring(1);
-            outputbox.innerHTML += String.fromCharCode(binary_to_unsigned(result));
+            outputbox.innerHTML += String.fromCharCode(binary_to_unsigned(data1.substring(1)));
             return;
     }
     if (result[0] == "1") {
@@ -487,9 +486,20 @@ function parse_integer(code) {
     var result = 0;
     if (code[1] == "D") {
         result = Number(code.substring(2));
+        if (result < -128) {
+            result = -128;
+        }
+        if (result > 127) {
+            result = 127;
+        }
     }
     else if (code[1] == "B") {
-        result = binary_to_unsigned(code.substring(2));
+        console.log(code);
+        var bincode = code.substring(2);
+        if (bincode.length > 8) {
+            bincode = bincode.substring(bincode.length - 8);
+        }
+        result = binary_to_unsigned(bincode);
     }
     else if (code[1] == "X") {
         result = binary_to_unsigned(hex_to_binary(code.substring(2)));
